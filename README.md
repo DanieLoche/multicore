@@ -1,8 +1,6 @@
 Scheduler Simulator
 ===================
 
-Scheduler Simulator is a 2013/14 Real-Time Systems course project.
+Scheduler Simulator is a Real-Time Systems Scheduling project.
 
-The project's goal is to simulate the behavior of a [Preemptive or Non-Preemptive](http://en.wikipedia.org/wiki/Preemption_(computing\)) [Priority-Driven Scheduler](http://en.wikipedia.org/wiki/Scheduling_(computing\)#Fixed_priority_pre-emptive_scheduling) on a Dynamic Task System on [Multiprocessors](http://en.wikipedia.org/wiki/Multiprocessor).
-
-The project is completely written in C++ and platform independent.
+The project's goal is to simulate the behavior of Task Chains Priority-Driven Scheduleron a Dynamic Task System on Mono and Multiprocessor.
