@@ -5,10 +5,6 @@ set(HEADER_FILES headers)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
-#SET(SOURCES src/*.cpp ${YOUR_DIRECTORY}/*.h)
-#add_executable(multicoreScheduler ${SOURCES})
-
-
 
 add_executable(multicoreScheduler ${files})
 target_include_directories(multicoreScheduler PRIVATE ${HEADER_FILES})
