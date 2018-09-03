@@ -1,20 +1,11 @@
-/********************************************************
- * scheduler.cpp                                        *
- *                                                      *
- * Corso Sistemi in tempo Reale               			*
- * Progetto Tipo 1	P3									*
- * Anno 2013/14                                         *
- * Universita' degli studi   di Padova                  *
- *                                                      *
- * Author: Federico Zanetello                           *
- ********************************************************/
 #include "scheduler.h"
 
-scheduler::scheduler(bool _preemptive, bool _bestEffort, unsigned _processorsNumber, const std::vector<job>& _jobs, int _unfeasibleJobsNumber) {
+scheduler::scheduler(bool _preemptive, std::string _policy, bool _bestEffort, unsigned _processorsNumber, const std::vector<job>& _jobs, int _unfeasibleJobsNumber) {
 	// initialising parameters
 
 	preemptive = _preemptive;
 	bestEffort = _bestEffort;
+	policySelecter(_policy);
 
 	processors.assign(_processorsNumber, processor());
 	for(unsigned i = 0; i < _processorsNumber; i++)
@@ -44,8 +35,8 @@ bool scheduler::checkIncomingJobs(){
 	bool thereAreNewReadyJobs = false;
 	if(incomingJobsMap[clockStep].size() > 0) { //If there are new jobs
 		for (std::list<int>::iterator it = incomingJobsMap[clockStep].begin(); it != incomingJobsMap[clockStep].end(); it++) {
-			int temp = *it;
-			if(jobs[temp].release() == utilities::READY){
+			int temp = *it;					// job ID
+			if(jobs[temp].release() == utilities::READY){		// Check si le job peut être exécuté ou s'il doit attendre d'autres tâches
 				lists::addToList(temp, utilities::READY);
 				thereAreNewReadyJobs = true;
 			}
@@ -60,14 +51,14 @@ bool scheduler::executeStep(){
 	bool somethingEnded = false; //if a job ended this function returns true
 	for(std::vector<processor>::size_type i = 0; i != processors.size(); ++i) {
 		int processRunning = processors[i].executeStep();
-		if(processRunning  >= 0) {
+		if(processRunning  >= 0) {					// If a job is executed in processor i
 			if(jobs[processRunning].executeOneStep(clockStep)) { //returns true when the job ends
 				processors[i].setJob(-1); //remove job from processor
 				addToList(processRunning, utilities::EXECUTED); //add job in executed jobs list
 				jobsThatNotMetTheirDeadline += jobs[processRunning].deadlineMet() ? 0 : 1;
 				removeDependencies(processRunning, jobs); // alerts other jobs about that the job finished
 
-				somethingEnded = true; //for return porpouses
+				somethingEnded = true; //for return purpouses
 			}
 		}
 	}
@@ -145,14 +136,26 @@ void scheduler::printReport() {
 	    printMachineTimeline();
 }
 
-void scheduler::dispatcher() {
+void scheduler::policySelecter(std::string _policy)
+{
+	if (_policy == "FIFO")
+		policy_fct = std::bind(&scheduler::FifoPolicy, this);
+	else if (_policy == "RoundRobin")
+		policy_fct = std::bind(&scheduler::RoundRobinPolicy, this);
+}
+
+// Scheduling Policy is Here !! :)
+void scheduler::FifoPolicy()
+{
 	if(readyJobsList.empty()) return; //no processes ready, no party
 
-	if(preemptive) { //if the system is preemptive
+	if(preemptive)
+	{ //if the system is preemptive
 		std::map<int,int> myMap = getProcessorsOrderedByJobId();
 
 		//first let's fill up processors without a job
-		for (std::map<int,int>::iterator it = myMap.begin(); it != myMap.end() && !readyJobsList.empty() && it->first < 0; it++){
+		for (std::map<int,int>::iterator it = myMap.begin(); it != myMap.end() && !readyJobsList.empty() && it->first < 0; it++)
+		{
 			processors[it->second].setJob(readyJobsList.front());
 			readyJobsList.pop_front();
 		}
@@ -160,7 +163,8 @@ void scheduler::dispatcher() {
 		//secondly let's preempt jobs with low priority
 		for (std::map<int,int>::iterator it = myMap.end(); !readyJobsList.empty() && it->first >= 0; it--){
 			if(it == myMap.end()) it--;
-			if(it->first > readyJobsList.front()) {
+			if(it->first > readyJobsList.front())
+			{
 				addToList(it->first, utilities::READY);
 				processors[it->second].setJob(readyJobsList.front());
 				readyJobsList.pop_front();
@@ -171,8 +175,10 @@ void scheduler::dispatcher() {
 				break;
 		}
 	}
-	else { //if the system ain't preemptive
-		for(std::vector<processor>::size_type i = 0; (i != processors.size()) && !readyJobsList.empty(); ++i) {
+	else
+	{ //if the system ain't preemptive
+		for(std::vector<processor>::size_type i = 0; (i != processors.size()) && !readyJobsList.empty(); ++i)
+		{
 			if(processors[i].getJob() < 0){ //if there's no job running on this processor
 				processors[i].setJob(readyJobsList.front());
 				readyJobsList.pop_front();
@@ -181,12 +187,18 @@ void scheduler::dispatcher() {
 	}
 }
 
+void scheduler::RoundRobinPolicy()
+{
+	// TBD
+}
+
+
 void scheduler::step() {
 	clockStep++; //updates clock
 
 	if(checkIncomingJobs()) //returns true if one or more jobs
-		dispatcher();
+		policy_fct();
 
 	if(executeStep()) //returns true if one or more jobs end!
-		dispatcher();
+		policy_fct();
 }

@@ -1,9 +1,9 @@
 /********************************************************
- * utilites.h   										*
- * 				                                        *
- * Corso Sistemi in tempo Reale               			*
- * Progetto Tipo 1	P3									*
- * Anno 2013/14                                         *
+ * utilites.h   																				*
+ * 				                                        			*
+ * Corso Sistemi in tempo Reale               					*
+ * Progetto Tipo 1	P3																	*
+ * Anno 2013/14                                					*
  * Universita' degli studi   di Padova                  *
  *                                                      *
  * Author: Federico Zanetello                           *
@@ -18,6 +18,7 @@
 #include <sstream>
 #include <fstream>
 #include <limits>
+#include <functional>
 
 namespace utilities {
 	enum job_state { EXECUTED, INCOMING, READY, RUNNING, WAITING }; 		// possible job states

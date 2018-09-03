@@ -1,13 +1,3 @@
-/********************************************************
- * lists.h                                              *
- *                                                      *
- * Corso Sistemi in tempo Reale               			*
- * Progetto Tipo 1	P3									*
- * Anno 2013/14                                         *
- * Universita' degli studi   di Padova                  *
- *                                                      *
- * Author: Federico Zanetello                           *
- ********************************************************/
 #include "utilities.h"
 #include "job.h"
 #include <algorithm>

@@ -1,13 +1,3 @@
-/********************************************************
- * main.cpp                                             *
- *                                                      *
- * Corso Sistemi in tempo Reale               			*
- * Progetto Tipo 1	P3									*
- * Anno 2013/14                                         *
- * Universita' degli studi   di Padova                  *
- *                                                      *
- * Author: Federico Zanetello                           *
- ********************************************************/
 #include "scheduler.h"
 using namespace lists;
 
@@ -16,9 +6,10 @@ void readAndInitialiseJob(int jobId,  std::istringstream& iss); // read from inp
 
 bool preemptive = true;											// by default the machine is preemptive
 bool bestEffort = true;											// by default the machine is best effort (executes unfeasible jobs)
+std::string policy = "FIFO";								// Scheduling Policy to be used
 std::vector<job> jobs;											// array of system's jobs
-int jobsThatNotMetTheirDeadline = 0;							// current jobs number that finished after their deadline
-int unfeasibleJobsNumber = 0;									// current unfeasible jobs number
+int jobsThatNotMetTheirDeadline = 0;				// current jobs number that finished after their deadline
+int unfeasibleJobsNumber = 0;								// current unfeasible jobs number
 unsigned totalJobsNumber;										// total number of jobs in the system
 unsigned processorsNumber;
 
@@ -28,7 +19,7 @@ int main(int argc, char** argv){
 
     std::cout << "Starting machine...\n\n";
 
-    scheduler(preemptive, bestEffort, processorsNumber, jobs, unfeasibleJobsNumber);
+    scheduler(preemptive, policy, bestEffort, processorsNumber, jobs, unfeasibleJobsNumber);
 
     return 0;
 }
@@ -74,28 +65,43 @@ void readFromFile() {
 		switch(++lineNumber) {
 			case 0:
 				iss >> temp;
-				if(temp == 0){
+				if(temp == 0) {
 					preemptive = false;
 					std::cout << " -Non-preemptive;\n";
 				}
-				else
+				else {
+					preemptive = true;
 					std::cout << " -Preemptive;\n";
-
+				}
 				break;
 			case 1:
 				iss >> temp;
-				if(temp == 0){
+				if(temp == 1)
+				{
+					policy = "FIFO";
+				} else if (temp == 2)
+				{
+					policy = "RoundRobin";
+				}
+				std::cout << " -Scheduling Policy: " << policy << ";\n";
+				break;
+			case 2:
+				iss >> temp;
+				if(temp == 0)
+				{
 					bestEffort = false;
 					std::cout << " -Non best effort (doesn't execute unfeasible jobs);\n";
 				}
-				else
+				else {
+					bestEffort = false;
 					std::cout << " -Best effort (executes unfeasible jobs);\n";
+				}
 				break;
-			case 2:
+			case 3:
 				iss >> processorsNumber;
 				std::cout << " -Processors: " << processorsNumber << ";\n";
 				break;
-			case 3:
+			case 4:
 				iss >> totalJobsNumber;
 				std::cout << " -Jobs: " << totalJobsNumber << ";\n\n";
 				jobs.assign(totalJobsNumber, job());
