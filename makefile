@@ -1,30 +1,44 @@
+## COMPILER ##
 CXX = g++
 RM = rm -f
-CFLAGS = -Wall -std=c++11 -Iinclude
-EXEC_NAME = SchedulerSimulator
-# INCLUDES = to include other makefiles
-# LIBS = ""
-HEADER_FILES = $(shell find ./include -maxdepth 1 -name "*.h")
-SRC_FILES = $(shell find ./src -maxdepth 1 -name "*.cpp")
-OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
-INSTALL_DIR = ./bin
+CXXFLAGS = -Wall -std=c++11 -I $(HDR_DIR)
 
+## PROJECT ##
+EXEC_NAME = SchedulerSimulator
+INSTALL_DIR = .
+
+## DIRECTORIES ##
+OBJ_DIR = bin
+SRC_DIR = src
+HDR_DIR = include
+# INCLUDES =  # to include other makefiles
+# LIBS = #
+
+## FILES & FOLDERS ##
+HEADER_FILES = $(shell find $(HDR_DIR) -name "*.h")
+SRC_FILES = $(shell find $(SRC_DIR) -name "*.cpp")
+SRC_DIRS = $(shell find . -name "*.cpp" | dirname {} | sort | uniq | sed 's/\/$(SRC_DIR)//g')
+# OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
+OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
+
+## TARGETS ##
 all : $(EXEC_NAME)
 
 clean :
 	$(RM) $(OBJ_FILES)
 
 $(EXEC_NAME) : $(OBJ_FILES)
+	mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(EXEC_NAME) $(OBJ_FILES) $(LIBS)
 
-%.o: %.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc
 	$(CXX) $(CFLAGS) $(INCLUDES) -o $@ -c $<
 
-%.o: %.cc
-	$(CXX) $(CFLAGS) $(INCLUDES) -o $@ -c $<
-
-%.o: %.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	gcc $(CFLAGS) $(INCLUDES) -o $@ -c $<
 
 install :
-	cp $(EXEC_NAME) $(INSTALL_DIR)
+	cp $(OBJ_DIR)/$(EXEC_NAME) $(INSTALL_DIR)
