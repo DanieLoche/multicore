@@ -12,7 +12,7 @@ OBJ_DIR = bin
 SRC_DIR = src
 HDR_DIR = include
 # INCLUDES =  # to include other makefiles
-# LIBS = #
+LIBS = -lboost_system
 
 ## FILES & FOLDERS ##
 HEADER_FILES = $(shell find $(HDR_DIR) -name "*.h")

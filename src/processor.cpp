@@ -13,10 +13,12 @@ int processor::executeStep(){
 	timeline.push_back(job);
 	return job;
 }
+
 void processor::initialise(int procId) {
 	id = procId;
 	job = -id;
 }
+
 void processor::printTimeline(){
 	std::cout << " [" << std::setw(2) << std::setfill('0') << id << "]: ";
 
