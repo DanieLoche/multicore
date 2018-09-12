@@ -12,7 +12,7 @@ OBJ_DIR = bin
 SRC_DIR = src
 HDR_DIR = include
 # INCLUDES =  # to include other makefiles
-LIBS = -lboost_system
+LIBS = -lboost_system -lboost_chrono -lpthread -lboost_thread
 
 ## FILES & FOLDERS ##
 HEADER_FILES = $(shell find $(HDR_DIR) -name "*.h")
@@ -42,3 +42,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 install :
 	cp $(OBJ_DIR)/$(EXEC_NAME) $(INSTALL_DIR)
+
+run :
+	./$(EXEC_NAME)
